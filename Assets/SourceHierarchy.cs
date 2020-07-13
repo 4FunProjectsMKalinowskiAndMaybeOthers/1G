@@ -5,6 +5,36 @@ using UnityEngine;
 
 public class SourceHierarchy : MonoBehaviour
 {
+    public class Optional<T>
+    {
+        T val;
+        bool seted = false;
+
+        public Optional()
+        {
+            seted = false;
+        }
+
+        public Optional(T val)
+        {
+            this.val = val;
+            seted = true;
+        }
+
+        public T ValueOr(T orValue)
+        {
+            if (seted)
+            {
+                return val;
+            } else
+            {
+                return orValue;
+            }
+
+        }
+
+    }
+
     public enum putDirection {
         input,
         output
@@ -27,6 +57,18 @@ public class SourceHierarchy : MonoBehaviour
     public class MaterialId
     {
         public int id;
+
+        public MaterialId() { }
+
+        public MaterialId(int id)
+        {
+            this.id = id;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0}", id);
+        }
     }
 
     public class MaterialHolder
@@ -65,8 +107,8 @@ public class SourceHierarchy : MonoBehaviour
 
     public abstract class MainPut
     {
-        protected uint ref_x;
-        protected uint ref_y;
+        protected int ref_x;
+        protected int ref_y;
         protected Output neighbor;
         protected putDirection put;
         protected direction faceDirection;
@@ -74,18 +116,46 @@ public class SourceHierarchy : MonoBehaviour
         protected MaterialHolder materialHolded;
         protected putState state;
 
-        public int takeMaterial(MaterialHolder holded, int grabCount)
+        public MaterialHolder takeMaterial(MaterialHolder holded, int grabCount)
         {
-            if(holded == null || holded.getMaterialId() == materialHolded.getMaterialId())
+            if(materialHolded != null && (holded == null || holded.getMaterialId() == materialHolded.getMaterialId()))
             {
                 int maxPossible = materialHolded.Substract(grabCount);
-                if(maxPossible != grabCount)
+                MaterialId mid = materialHolded.getMaterialId();
+                if (maxPossible != grabCount)
                 {
                     materialHolded = null;
                 }
-                return maxPossible;
+                return new MaterialHolder(mid, maxPossible);
             }
-            return 0;
+            return null;
+        }
+
+        public bool addMaterial(MaterialId id, int count)
+        {
+            if(materialHolded == null)
+            {
+                materialHolded = new MaterialHolder(id, count);
+            } else if (materialHolded.getMaterialId() == id)
+            {
+                materialHolded.Add(count);
+                return true;
+            }
+            return false;
+        }
+
+        public override string ToString()
+        {
+            String desc = String.Empty;
+            if (materialHolded != null)
+            {
+                desc += String.Format("EQ: {0} {1} {2}", materialHolded.getMaterialId(), materialHolded.getCount(), Environment.NewLine);
+            } else
+            {
+                desc += String.Format("EQ: Nothing {0}", Environment.NewLine);
+            }
+
+            return desc;
         }
     }
 
@@ -98,12 +168,25 @@ public class SourceHierarchy : MonoBehaviour
             grabCount = 1;
         }
 
+        public Input(int ref_x, int ref_y, Output neighbor, direction faceDirection, List<MaterialId> materialsFilter, MaterialHolder materialHolded, putState state, int grabCount)
+        {
+            this.ref_x = ref_x;
+            this.ref_y = ref_y;
+            this.neighbor = neighbor;
+            put = putDirection.input;
+            this.faceDirection = faceDirection;
+            this.materialsFilter = materialsFilter;
+            this.materialHolded = materialHolded;
+            this.state = state;
+            this.grabCount = grabCount;
+        }
+
         public bool getFromNeighbour()
         {
             if(neighbor != null)
             {
-                int neighbourPresentCount = neighbor.takeMaterial(materialHolded, grabCount);
-                materialHolded.Add(neighbourPresentCount);
+                MaterialHolder neighbourPresent = neighbor.takeMaterial(materialHolded, grabCount);
+                addMaterial(neighbourPresent.getMaterialId(), neighbourPresent.getCount());
                 return true;
             }
             return false;
@@ -112,13 +195,39 @@ public class SourceHierarchy : MonoBehaviour
 
     public class Output : MainPut
     {
-
+        public Output() { }
+        public Output(int ref_x, int ref_y, Output neighbor, direction faceDirection, List<MaterialId> materialsFilter, MaterialHolder materialHolded, putState state)
+        {
+            this.ref_x = ref_x;
+            this.ref_y = ref_y;
+            this.neighbor = neighbor;
+            put = putDirection.output;
+            this.faceDirection = faceDirection;
+            this.materialsFilter = materialsFilter;
+            this.materialHolded = materialHolded;
+            this.state = state;
+        }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        List<MaterialId> filterO = new List<MaterialId>();
+        List<MaterialId> filterI = new List<MaterialId>();
+        filterO.Add(new MaterialId(1));
+        filterI.Add(new MaterialId(1));
+
+        Output op = new Output(0, 0, null, direction.up, filterO, new MaterialHolder(new MaterialId(1), 4), putState.connected);
+        Input input = new Input(0, 0, op, direction.down,filterI, null, putState.connected, 5);
+
+        Debug.Log(op.ToString());
+        Debug.Log(input.ToString());
+
+        Console.Out.WriteLine("After Grab");
+        input.getFromNeighbour();
+
+        Debug.Log(op.ToString());
+        Debug.Log(input.ToString());
     }
 
     // Update is called once per frame
