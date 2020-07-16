@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SourceHierarchy : MonoBehaviour
+namespace GameClass
 {
+
     public class Optional<T>
     {
         T val;
@@ -209,30 +210,5 @@ public class SourceHierarchy : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        List<MaterialId> filterO = new List<MaterialId>();
-        List<MaterialId> filterI = new List<MaterialId>();
-        filterO.Add(new MaterialId(1));
-        filterI.Add(new MaterialId(1));
 
-        Output op = new Output(0, 0, null, direction.up, filterO, new MaterialHolder(new MaterialId(1), 4), putState.connected);
-        Input input = new Input(0, 0, op, direction.down,filterI, null, putState.connected, 5);
-
-        Debug.Log(op.ToString());
-        Debug.Log(input.ToString());
-
-        Console.Out.WriteLine("After Grab");
-        input.getFromNeighbour();
-
-        Debug.Log(op.ToString());
-        Debug.Log(input.ToString());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
