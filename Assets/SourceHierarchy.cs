@@ -70,6 +70,30 @@ namespace GameClass
         {
             return String.Format("{0}", id);
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is MaterialId ? id.Equals((obj as MaterialId).id) : id.Equals(obj);
+        }
+
+        public static bool operator ==(MaterialId obj, MaterialId obj2)
+        {
+            return obj.id.Equals(obj2.id);
+        }
+
+        public static bool operator !=(MaterialId obj, MaterialId obj2)
+        {
+            return !obj.id.Equals(obj2.id);
+        }
+
+
+        public override int GetHashCode()
+        {
+            return id.GetHashCode();
+        }
+
+        public static implicit operator int(MaterialId d) => d.id;
+        public static implicit operator MaterialId(int d) => new MaterialId(d);
     }
 
     public class MaterialHolder
