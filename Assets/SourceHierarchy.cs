@@ -106,6 +106,38 @@ namespace GameClass
         }
     }
 
+    public class comparePut : IComparer<MainPut>
+    {
+        public int Compare(MainPut x, MainPut y)
+        {
+            if (x.getHoldInfo() == null && y.getHoldInfo() == null)
+            {
+                return 0;
+            }
+            else if (x.getHoldInfo() == null && y.getHoldInfo() != null)
+            {
+                return -1;
+            }
+            else if (x.getHoldInfo() != null && y.getHoldInfo() == null)
+            {
+                return 1;
+            }
+            else
+            {
+                if( x.getHoldInfo().getCount() > y.getHoldInfo().getCount())
+                {
+                    return 1;
+                } else if (x.getHoldInfo().getCount() == y.getHoldInfo().getCount())
+                {
+                    return 0;
+                } else
+                {
+                    return -1;
+                }
+            }
+        }
+    }
+
     public abstract class MainPut
     {
         protected int ref_x;
@@ -116,6 +148,11 @@ namespace GameClass
         protected List<MaterialId> materialsFilter;
         protected MaterialHolder materialHolded;
         protected putState state;
+
+        public MaterialHolder getHoldInfo()
+        {
+            return materialHolded;
+        }
 
         public MaterialHolder takeMaterial(MaterialHolder holded, int grabCount)
         {
