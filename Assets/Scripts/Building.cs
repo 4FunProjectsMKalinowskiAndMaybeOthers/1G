@@ -13,12 +13,14 @@ public class Building
     public long id;
     public long uuid;
     public int x, y;
+    public static int test= 0;
 
     public Building(int x, int y, int cuuid) {
-        int? freeId = getFreeId();
+        int? freeId = getFreeId(true);
         if (freeId.HasValue)
-        {           
+        {
             id = (int)freeId;
+            freeIds.Add(true);
             uuid = cuuid;
         }else
         {
@@ -33,20 +35,32 @@ public class Building
         return BuildingUUID.getSpaceOccupied(uuid);
     }
 
-    public static int? getFreeId() {
+    public static int? getFreeId(bool occupy) {
+        //Checking after last id
         if (freeIds.Count <= maxIdNumber)
         {
+            if (occupy == true)
+            {
+                freeIds.Add(true);
+            }
             return freeIds.Count + 1;
         }
+        //Check if there is space in the middle of ids
         else {
             for (int i=minIdNumber; i<maxIdNumber; i++ ) {
                 if (freeIds[i] == false) {
-                return i;
+                    if (occupy == true)
+                    {
+                        freeIds[i] = true;
+                    }
+                    return i;
                 }
             }
         }
 
+        //No free id found
     return null;
         
     }
+
 }

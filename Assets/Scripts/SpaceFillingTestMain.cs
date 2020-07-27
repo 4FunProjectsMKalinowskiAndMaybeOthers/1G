@@ -9,8 +9,8 @@ public class SpaceFillingTestMain : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m = new Map();
-        m.Load();
+        m = new Map(10, 10);
+        m.LoadTestMap();
     }
 
     // Update is called once per frame
