@@ -64,8 +64,12 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Building.cs" />
     <Compile Include="Assets\Scripts\BuildingUUID.cs" />
+    <Compile Include="Assets\Scripts\Damage.cs" />
+    <Compile Include="Assets\Scripts\MainPut.cs" />
     <Compile Include="Assets\Scripts\Map.cs" />
+    <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\PlayerItem.cs" />
+    <Compile Include="Assets\Scripts\PlayerItemUUID.cs" />
     <Compile Include="Assets\Scripts\SpaceFillingTestMain.cs" />
     <Compile Include="Assets\SpaceFillingTest.cs" />
     <Reference Include="UnityEngine">

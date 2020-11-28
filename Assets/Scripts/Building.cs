@@ -7,35 +7,45 @@ using UnityEngine;
 
 public class Building
 {
+    //Class
+    public static int test = 0;
+    private static int minIdNumber = 0, maxIdNumber = int.MaxValue;
     public static List<bool> freeIds = new List<bool>();
-    private static int minIdNumber=0, maxIdNumber = int.MaxValue;
 
+    //Object
     public long id;
     public long uuid;
     public int x, y;
-    public static int test= 0;
-
+    
+    //When checking after construcion of building object then if not placed it must be erasted by Garbage Collector so it is better to check it before construction
     public Building(int x, int y, int cuuid) {
-        int? freeId = getFreeId(true);
+        int? freeId = Building.getFreeId(true);
         if (freeId.HasValue)
         {
-            id = (int)freeId;
-            freeIds.Add(true);
-            uuid = cuuid;
+            if (Map.compareOccupiedSpaces(x, y, this.uuid, cuuid, Map.OccupyState.Free).Count == 0)
+            {
+                //Building
+                id = (int)freeId;
+                uuid = cuuid;
+            }else
+            {
+                //Cannot build action - no space on the map in (x,y)
+            }
         }else
         {
-            string trace = "No free id found in class:" + this.GetType().FullName + 
+            //Cannot build action - no free id for a building
+            
+            /*string trace = "No free id found in class:" + this.GetType().FullName + 
                 " method:" + ((new StackTrace()).GetFrame(0).GetMethod());
             UnityEngine.Debug.Log(trace);
             throw new IndexOutOfRangeException(trace);
+            */
         }
+
     }
 
-    public bool[,] getSpaceOccupied() {
-        return BuildingUUID.getSpaceOccupied(uuid);
-    }
-
-    public static int? getFreeId(bool occupy) {
+    public static int? getFreeId(bool occupy)
+    {
         //Checking after last id
         if (freeIds.Count <= maxIdNumber)
         {
@@ -46,9 +56,12 @@ public class Building
             return freeIds.Count + 1;
         }
         //Check if there is space in the middle of ids
-        else {
-            for (int i=minIdNumber; i<maxIdNumber; i++ ) {
-                if (freeIds[i] == false) {
+        else
+        {
+            for (int i = minIdNumber; i < maxIdNumber; i++)
+            {
+                if (freeIds[i] == false)
+                {
                     if (occupy == true)
                     {
                         freeIds[i] = true;
@@ -59,8 +72,11 @@ public class Building
         }
 
         //No free id found
-    return null;
-        
+        return null;
+
     }
 
+    public bool[,] getSpaceOccupied() {
+        return BuildingUUID.getSpaceOccupied(uuid);
+    }
 }
