@@ -16,13 +16,14 @@ public class SpaceFillingTestMain : MonoBehaviour
         m = new Map(10, 10);
         m.LoadTestMap();
 
-        List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = Map.compareOccupiedSpaces(1, 1, 0, 0, Map.OccupyState.Occupied);
+        List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = Map.compareOccupiedSpaces(0, 0, 0, 0, Map.OccupyState.Occupied);
 
         Debug.Log("Colliding fields");
-        foreach (Tuple<Map.OccupyState, Tuple<int, int>> tMain in collidingFields) {
+        foreach (Tuple<Map.OccupyState, Tuple<int, int>> tMain in collidingFields)
+        {
             Debug.Log(tMain.Item2.Item1 + " " + tMain.Item2.Item2 + " " + tMain.Item1.ToString());
         }
-}
+    }
 
 // Update is called once per frame
 void Update()

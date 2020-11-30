@@ -62,7 +62,7 @@ public class Map
                                 //Building
                                 if (y + yTmp < mapMaxY && x + xTmp < mapMaxX)
                                 {
-                                    Debug.Log((y + yTmp) + " :?: " + (x + xTmp) + " bTmp" + bTmp);
+                                    //Debug.Log((y + yTmp) + " :?: " + (x + xTmp) + " bTmp" + bTmp);
                                     map[y + yTmp][x + xTmp] = bTmp;
                                 }
                             }
@@ -110,17 +110,29 @@ public class Map
         return mapBoolArray;
     }
 
-    public static List<Tuple<Map.OccupyState, Tuple<int, int>>> compareOccupiedSpaces(int yTranslation1, int xTranslation1, long uuid0, long uuid1, Map.OccupyState os) {
+    public static List<Tuple<Map.OccupyState, Tuple<int, int>>> compareOccupiedSpaces(int yTranslation0, int xTranslation0, int yTranslation1, int xTranslation1, long uuid0, long uuid1, Map.OccupyState os) {
         //HERETODO: Mode:   0 Building-Building   1 Map-Building   2-Map-Building-Building
         //AND: what type of occupying states buildings are trying to achieve
 
-        //b[0].y + yTranslation1 = b[1].y
+        //Values error checking
+        //UPPER, DOWN, LEFT, RIGHT
+        Tuple<int, int>[,] bOF0 = BuildingUUID.getOutermostFields(uuid0);
+        Tuple<int, int>[,] bOF1 = BuildingUUID.getOutermostFields(uuid1);
+        if (checkIfBuildingIsOutsideTheMap(bOF0, yTranslation0, xTranslation0) 
+            || checkIfBuildingIsOutsideTheMap(bOF1, yTranslation1, xTranslation1)) {
+            return null;
+        }
+
+        //b[0].y = b[1].y - yTranslation1
         List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = new List<Tuple<Map.OccupyState, Tuple<int, int>>>();
 
         //Get max size of fields
         //[y, x]
         Tuple<int, int> testMapSize = getTestMapSizeForCompareOccupiedSpaces(yTranslation1, xTranslation1, uuid0, uuid1);
-        Map.OccupyState[,] testMap = new Map.OccupyState[testMapSize.Item1, testMapSize.Item2]; 
+        Map.OccupyState[,] testMap = new Map.OccupyState[testMapSize.Item1, testMapSize.Item2];
+        Debug.Log("TestMapSize:" + testMapSize.Item1 + " " + testMapSize.Item2);
+
+       
 
         List<bool[,]> b = new List<bool[,]>();
         b.Add(BuildingUUID.getSpaceOccupied(uuid0));
@@ -154,6 +166,10 @@ public class Map
         }
 
         return collidingFields;
+    }
+
+    bool checkIfBuildingIsOutsideTheMap(Tuple<int,int>[,] bOutermostFields, yTranslation, xTranslation) {
+        if()
     }
 
     public static Tuple<int, int> getTestMapSizeForCompareOccupiedSpaces(int yTranslation1, int xTranslation1, long uuid0, long uuid1){
