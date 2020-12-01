@@ -12,7 +12,8 @@ namespace Assets.Scripts
         List<PlayerItem> wornItems = new List<PlayerItem>();
 
         //Object should be replaced with appropiate class or even beter - interface
-        public Damage attackWithEverything(Object attackedObject) {
+        public Damage attackWithEverything(Object attackedObject)
+        {
             Damage damage = new Damage();
 
             damage.damageNow += 1;
@@ -29,6 +30,17 @@ namespace Assets.Scripts
             */
 
             return damage;
+        }
+
+
+        static bool deleteResourcesForBuilding(List<Tuple<long, int>> resourcesToSubtract)
+        {
+            return true;
+        }
+
+        static bool hasEnoughResources(List<Tuple<long, int>> resourcesNeeded)
+        {
+            return true;
         }
     }
 }

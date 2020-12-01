@@ -17,7 +17,7 @@ namespace Assets
 
         //Need to assign null if building's occupied space has changed
         //(y,x) Upper, Down, Left, Right     -Like WSAD
-        static Tuple<int, int>[,] outermostFields = null;
+        static Tuple<int, int>[] outermostFields = null;
         
 
         public static bool[,] getSpaceOccupied(long uuid)
@@ -28,7 +28,7 @@ namespace Assets
 
         //HERETODO: This method
         //Using singleton pattern
-        public static Tuple<int, int>[,] getOutermostFields(long uuid) {
+        public static Tuple<int, int>[] getOutermostFields(long uuid) {
             //HERETODO: Check if building is not empty
             
             //Sides
@@ -79,9 +79,9 @@ namespace Assets
                 }
                 if (empty == false)
                 {
-                        outermostFields = new Tuple<int, int>[,]{
-                            { new Tuple<int, int>(yOF[0], xOF[0]), new Tuple<int, int>(yOF[1], xOF[1])},
-                            { new Tuple<int, int>(yOF[2], xOF[2]), new Tuple<int, int>(yOF[3], xOF[3])}
+                        outermostFields = new Tuple<int, int>[]{
+                             new Tuple<int, int>(yOF[0], xOF[0]), new Tuple<int, int>(yOF[1], xOF[1]),
+                             new Tuple<int, int>(yOF[2], xOF[2]), new Tuple<int, int>(yOF[3], xOF[3])
                     };
                 }               
             }

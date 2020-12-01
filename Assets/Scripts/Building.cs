@@ -1,10 +1,8 @@
 ﻿using Assets;
+using Assets.Scripts;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-
 public class Building
 {
     //Class
@@ -22,19 +20,31 @@ public class Building
         int? freeId = Building.getFreeId(true);
         if (freeId.HasValue)
         {
-            if (Map.compareOccupiedSpaces(x, y, this.uuid, cuuid, Map.OccupyState.Free).Count == 0)
+            //HERETODO: REPAIR a function invocation compareOccupiedSpaces to check for building and map occupation
+            UnityEngine.Debug.Log("cuuid: " + cuuid);
+            //TODO: WHen comparing with map and building only one uuid is needed
+            //if (Map.compareOccupiedSpaces(x, y, x, y, this.uuid, cuuid, Map.OccupyState.Free).Count == 0)
+            List<Tuple<Map.OccupyState, Tuple<int,int>>> collidingFields = Map.compareOccupiedSpaces(x, y, x, y, 0, cuuid, Map.OccupyState.Free);
+            if (Map.canBuildBuilding(this, y, x))
             {
                 //Building
                 id = (int)freeId;
                 uuid = cuuid;
             }else
             {
+                if (DebuggingM.BuildingAssert == 2) {
+                    Debug.Log("No space on the map in(" + x + "," + y + ")");
+                }
                 //Cannot build action - no space on the map in (x,y)
             }
         }else
         {
             //Cannot build action - no free id for a building
-            
+            if (DebuggingM.BuildingAssert == 2)
+            {
+                Debug.Log("No free id found for the building: " + cuuid + " on (" + x + "," + y + ")");
+            }
+
             /*string trace = "No free id found in class:" + this.GetType().FullName + 
                 " method:" + ((new StackTrace()).GetFrame(0).GetMethod());
             UnityEngine.Debug.Log(trace);

@@ -14,12 +14,13 @@ public class Map
     static Building[][] map;
 
     //Instance
-    int mapMaxX = 10, mapMaxY = 10;
+    public static int mapMaxX = 10, mapMaxY = 10;
 
 
     public Map(int cMapMaxX, int cMapMaxY) {
-        this.mapMaxX = cMapMaxX;
-        this.mapMaxY = cMapMaxY;
+        //TODO: Uncomment on final steps
+        //this.mapMaxX = cMapMaxX;
+        //this.mapMaxY = cMapMaxY;
     }
 
     public static Building[][] getMap() {
@@ -110,16 +111,19 @@ public class Map
         return mapBoolArray;
     }
 
+
+    //Returns null if building is outside the map
     public static List<Tuple<Map.OccupyState, Tuple<int, int>>> compareOccupiedSpaces(int yTranslation0, int xTranslation0, int yTranslation1, int xTranslation1, long uuid0, long uuid1, Map.OccupyState os) {
         //HERETODO: Mode:   0 Building-Building   1 Map-Building   2-Map-Building-Building
         //AND: what type of occupying states buildings are trying to achieve
 
         //Values error checking
         //UPPER, DOWN, LEFT, RIGHT
-        Tuple<int, int>[,] bOF0 = BuildingUUID.getOutermostFields(uuid0);
-        Tuple<int, int>[,] bOF1 = BuildingUUID.getOutermostFields(uuid1);
-        if (checkIfBuildingIsOutsideTheMap(bOF0, yTranslation0, xTranslation0) 
-            || checkIfBuildingIsOutsideTheMap(bOF1, yTranslation1, xTranslation1)) {
+        Tuple<int, int>[] bOF0 = BuildingUUID.getOutermostFields(uuid0);
+        Tuple<int, int>[] bOF1 = BuildingUUID.getOutermostFields(uuid1);
+        //TODO: Pass map sizes when everything is done
+        if (checkIfBuildingIsOutsideTheMap(Map.mapMaxY, Map.mapMaxX, bOF0, yTranslation0, xTranslation0) 
+            || checkIfBuildingIsOutsideTheMap(Map.mapMaxY, Map.mapMaxX, bOF1, yTranslation1, xTranslation1)) {
             return null;
         }
 
@@ -168,8 +172,26 @@ public class Map
         return collidingFields;
     }
 
-    bool checkIfBuildingIsOutsideTheMap(Tuple<int,int>[,] bOutermostFields, yTranslation, xTranslation) {
-        if()
+    //UPPER, DOWN, LEFT, RIGHT - bOuterMostFields(y,x) - Like WSAD
+    static bool checkIfBuildingIsOutsideTheMap(int mapMaxY, int mapMaxX, Tuple<int,int>[] bOutermostFields, int yTranslation, int xTranslation) {
+        bool outsideOfMap = false;
+        if (bOutermostFields[0].Item1 + yTranslation < 0)
+        {
+            outsideOfMap = true;
+        }
+        else if (bOutermostFields[1].Item1 + yTranslation > mapMaxY)
+        {
+            outsideOfMap = true;
+        }
+        else if (bOutermostFields[2].Item2 + xTranslation < 0)
+        {
+            outsideOfMap = true;
+        }
+        else if (bOutermostFields[3].Item2 + xTranslation > mapMaxX) {
+            outsideOfMap = true;
+        }
+
+        return outsideOfMap;
     }
 
     public static Tuple<int, int> getTestMapSizeForCompareOccupiedSpaces(int yTranslation1, int xTranslation1, long uuid0, long uuid1){
@@ -181,7 +203,7 @@ public class Map
         return size;
     }
 
-    public bool canBuildUnderField(OccupyState os1, OccupyState os2) {
+    static bool canBuildUnderField(OccupyState os1, OccupyState os2) {
         if (os1 == OccupyState.Free || os2 == OccupyState.Free)
         {//One of buildings has free space
             return true;
@@ -189,8 +211,20 @@ public class Map
         return false;
     }
 
-    public bool canPutBlueprintUnderField() {
+    static bool canPutBlueprintUnderField() {
         throw new NotImplementedException();
         return false;
+    }
+
+    public static bool canBuildBuilding(Building b, int y, int x) {
+        List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = compareOccupiedSpaces(0, 0, 0, 0, b.uuid, 0, OccupyState.Occupied);
+
+        if (collidingFields == null || collidingFields.Count == 0)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

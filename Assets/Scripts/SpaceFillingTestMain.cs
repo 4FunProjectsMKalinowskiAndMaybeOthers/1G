@@ -16,7 +16,7 @@ public class SpaceFillingTestMain : MonoBehaviour
         m = new Map(10, 10);
         m.LoadTestMap();
 
-        List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = Map.compareOccupiedSpaces(0, 0, 0, 0, Map.OccupyState.Occupied);
+        List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = Map.compareOccupiedSpaces(0, 0, 0, 0, 0, 0, Map.OccupyState.Occupied);
 
         Debug.Log("Colliding fields");
         foreach (Tuple<Map.OccupyState, Tuple<int, int>> tMain in collidingFields)
