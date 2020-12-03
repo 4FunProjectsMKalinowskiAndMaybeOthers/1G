@@ -1,4 +1,5 @@
 ﻿using Assets;
+using Assets.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,24 +36,27 @@ public class Map
         //Load map TMP
         map = new Building[mapMaxY][];
         Building bTmp = null;
-        int y;
+        int y, x;
         for (y = 0; y < mapMaxY; y++) {
             if (map[y] == null)
             {
                 map[y] = new Building[mapMaxX];
             }
-            int x;
             for (x = 0; x < mapMaxX; x++)
             {
+                Debug.Log("y" + y + " x" + x);
                 //Generating buildings every 3 y and 3 x spaces
                 if (y % 3 == 0 && x % 3 == 0)
                 {
+                    putBuilding(0, y, x);
+                    /*
                     for (int yTmp = 0; yTmp < 3; yTmp++)
                     {
                         if ((y + yTmp < mapMaxY) && map[y + yTmp] == null)
                         {
                             map[y + yTmp] = new Building[mapMaxX];
                         }
+
                         bTmp = new Building(x, y, newBuildingUUID);
                         for (int xTmp = 0; xTmp < 3; xTmp++) {
                             //Empty spaces, indentation in building
@@ -68,13 +72,14 @@ public class Map
                                 }
                             }
                         }
-                    }
+                    }*/
                 }
 
             }
         }
 
-        printOXMap();
+        //printOXMap();
+        printMap();
     }
 
     public void printMap() {
@@ -83,7 +88,13 @@ public class Map
         for (int y = 0; y < mapMaxY; y++) {
             line = "";
             for (int x = 0; x < mapMaxX; x++) {
-                line += map[y][x].id + " ";
+                if (map[y][x] != null)
+                {
+                    line += map[y][x].id + "_";
+                }
+                else {
+                    line += " _"; //Two spaces instead of number
+                }
             }
             Debug.Log(y + ":" + line);
         }
@@ -113,26 +124,39 @@ public class Map
 
 
     //Returns null if building is outside the map
-    public static List<Tuple<Map.OccupyState, Tuple<int, int>>> compareOccupiedSpaces(int yTranslation0, int xTranslation0, int yTranslation1, int xTranslation1, long uuid0, long uuid1, Map.OccupyState os) {
-        //HERETODO: Mode:   0 Building-Building   1 Map-Building   2-Map-Building-Building
+    public static List<Tuple<Map.OccupyState, Tuple<int, int>>> compareOccupiedSpaces(List<int> yTranslations, List<int> xTranslations, List<long> uuids, Map.OccupyState os) {
+        //HERETODO: Mode:   0 Map-Building   1 Building-Building   2-Map-Building-Building
         //AND: what type of occupying states buildings are trying to achieve
 
         //Values error checking
         //UPPER, DOWN, LEFT, RIGHT
-        Tuple<int, int>[] bOF0 = BuildingUUID.getOutermostFields(uuid0);
-        Tuple<int, int>[] bOF1 = BuildingUUID.getOutermostFields(uuid1);
-        //TODO: Pass map sizes when everything is done
-        if (checkIfBuildingIsOutsideTheMap(Map.mapMaxY, Map.mapMaxX, bOF0, yTranslation0, xTranslation0) 
-            || checkIfBuildingIsOutsideTheMap(Map.mapMaxY, Map.mapMaxX, bOF1, yTranslation1, xTranslation1)) {
-            return null;
-        }
 
+        List<Tuple<int, int>[]> bOFs = new List<Tuple<int, int>[]>();
+        List<List<Tuple<int, int>>> outsideOfMapBuildingsDims = new List<List<Tuple<int, int>>>();
+
+        //TODO: Check if sizes are equal in input lists
+        {
+            for (int i = 0; i < uuids.Count; i++) {
+                bOFs.Add(BuildingUUID.getOutermostFields(uuids[i]));
+                //HEREHEREHERETODO:
+                outsideOfMapBuildingsDims = 
+                if (checkIfBuildingIsOutsideTheMap(Map.mapMaxY, Map.mapMaxX, bOFs[i], yTranslations[i], xTranslations[i])) ;
+                {
+                    if (DebuggingM.MapAssert == 2)
+                    {
+                        Debug.Log("Building: " + i + " is outside of map");
+                    }
+                    return null;
+                }
+            }
+        }
+        //TODO: Pass map sizes when everything is done
         //b[0].y = b[1].y - yTranslation1
         List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = new List<Tuple<Map.OccupyState, Tuple<int, int>>>();
 
         //Get max size of fields
         //[y, x]
-        Tuple<int, int> testMapSize = getTestMapSizeForCompareOccupiedSpaces(yTranslation1, xTranslation1, uuid0, uuid1);
+        Tuple<int, int> testMapSize = getTestMapSizeForCompareOccupiedSpaces(yTranslations, xTranslations, uuids, bOFs);
         Map.OccupyState[,] testMap = new Map.OccupyState[testMapSize.Item1, testMapSize.Item2];
         Debug.Log("TestMapSize:" + testMapSize.Item1 + " " + testMapSize.Item2);
 
@@ -175,6 +199,7 @@ public class Map
     //UPPER, DOWN, LEFT, RIGHT - bOuterMostFields(y,x) - Like WSAD
     static bool checkIfBuildingIsOutsideTheMap(int mapMaxY, int mapMaxX, Tuple<int,int>[] bOutermostFields, int yTranslation, int xTranslation) {
         bool outsideOfMap = false;
+        
         if (bOutermostFields[0].Item1 + yTranslation < 0)
         {
             outsideOfMap = true;
@@ -190,16 +215,26 @@ public class Map
         else if (bOutermostFields[3].Item2 + xTranslation > mapMaxX) {
             outsideOfMap = true;
         }
-
+        Debug.Log(bOutermostFields + " " + outsideOfMap);
         return outsideOfMap;
     }
 
-    public static Tuple<int, int> getTestMapSizeForCompareOccupiedSpaces(int yTranslation1, int xTranslation1, long uuid0, long uuid1){
+    public static Tuple<int, int> getTestMapSizeForCompareOccupiedSpaces(List<int> yTranslations, List<int> xTranslations, List<long> uuids, List<Tuple<int, int>[]> bOFs){
         //y, x
-        Tuple<int, int> size = new Tuple<int, int>(
-            (BuildingUUID.getSpaceOccupied(uuid0).GetLength(0) + yTranslation1 > BuildingUUID.getSpaceOccupied(uuid1).GetLength(0) ?  BuildingUUID.getSpaceOccupied(uuid0).GetLength(0) + yTranslation1 : BuildingUUID.getSpaceOccupied(uuid1).GetLength(0))
+        int y = 0;
+        int x = 0;
+
+        //UPPER, DOWN, LEFT, RIGHT - bOuterMostFields(y,x) - Like WSAD
+        for (int i = 0; i < uuids.Count; i++) {
+            if((bOFs[i])[0] + yTranslations[i]
+                }
+
+        Tuple<int, int> size = new Tuple<int, int>(y, x);
+        /*
+            ()
             , (BuildingUUID.getSpaceOccupied(uuid0).GetLength(1) + xTranslation1 > BuildingUUID.getSpaceOccupied(uuid1).GetLength(1) ? BuildingUUID.getSpaceOccupied(uuid0).GetLength(1) + yTranslation1 : BuildingUUID.getSpaceOccupied(uuid1).GetLength(1))
             );
+            */
         return size;
     }
 
@@ -226,5 +261,29 @@ public class Map
         else {
             return false;
         }
+    }
+
+    public static byte putBuilding(int fuuid, int y, int x) {
+        List<Tuple<OccupyState, Tuple<int, int>>> collidingFields = compareOccupiedSpaces(0, 0, 0, 0, fuuid, 0, OccupyState.Occupied);
+        if (collidingFields == null || collidingFields.Count == 0)
+        {
+            Building bTmp = new Building(x, y, fuuid);
+            bool[,] spaceOccupied = bTmp.getSpaceOccupied();
+            for (int yIt = y; yIt < y + spaceOccupied.GetLength(0); yIt++) {
+                for (int xIt = x; xIt < x + spaceOccupied.GetLength(1); xIt++) {
+                    if (spaceOccupied[yIt, xIt] == true) {
+                        map[yIt][xIt] = bTmp;
+                    }
+                }
+            }
+        }
+        else {
+            if (DebuggingM.MapAssert == 1) {
+                Debug.Log("Error putBuilding");
+            }
+            return 1;
+        }
+
+        return 0;
     }
 }

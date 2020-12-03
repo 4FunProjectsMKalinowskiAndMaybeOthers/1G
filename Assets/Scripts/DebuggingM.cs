@@ -10,5 +10,6 @@ namespace Assets.Scripts
     {
         //0-nothing 1-errors 2-verbose 3-highly_verbose
         public static byte BuildingAssert = 0;
+        public static byte MapAssert = 2;
     }
 }

@@ -28,7 +28,7 @@ public class Building
             if (Map.canBuildBuilding(this, y, x))
             {
                 //Building
-                id = (int)freeId;
+                id = (long)freeId;
                 uuid = cuuid;
             }else
             {
