@@ -59,7 +59,7 @@ public class Map
             {
                 //Generating buildings every 3 y and 3 x spaces
                 if (y % 3 == 0 && x % 3 == 0)
-                {
+                { 
                     putBuilding(newBuildingUUID, y, x, Map.OccupyState.Occupied);
                 }
 
@@ -76,7 +76,7 @@ public class Map
         string line = "";
         for (int y = 0; y < mapMaxY; y++)
         {
-            line = "";
+            line = "\t";
             for (int x = 0; x < mapMaxX; x++)
             {
                 if (map[y][x] != null)
@@ -346,7 +346,7 @@ public class Map
     {
         if (canBuildBuilding(fuuid, y, x, bOccupyState))
         {
-            Building bTmp = new Building(x, y, fuuid);
+            Building bTmp = new Building(y, x, fuuid);
             bool[,] spaceOccupied = bTmp.getSpaceOccupied();
             for (int yIt = y; yIt < y + spaceOccupied.GetLength(0); yIt++)
             {
