@@ -14,9 +14,10 @@ public class Building
     public long id;
     public long uuid;
     public int x, y;
-    
+
     //When checking after construcion of building object then if not placed it must be erasted by Garbage Collector so it is better to check it before construction
-    public Building(int x, int y, int cuuid) {
+    public Building(int y, int x, int cuuid)
+    {
         int? freeId = Building.getFreeId(true);
         if (freeId.HasValue)
         {
@@ -24,20 +25,24 @@ public class Building
             UnityEngine.Debug.Log("cuuid: " + cuuid);
             //TODO: WHen comparing with map and building only one uuid is needed
             //if (Map.compareOccupiedSpaces(x, y, x, y, this.uuid, cuuid, Map.OccupyState.Free).Count == 0)
-            List<Tuple<Map.OccupyState, Tuple<int,int>>> collidingFields = Map.compareOccupiedSpaces(x, y, x, y, 0, cuuid, Map.OccupyState.Free);
-            if (Map.canBuildBuilding(this, y, x))
+
+            if (Map.canBuildBuilding(cuuid, y, x, Map.OccupyState.WaitingForConstruction))
             {
                 //Building
                 id = (long)freeId;
                 uuid = cuuid;
-            }else
+                Debug.Log("New b id: " + id);
+            }
+            else
             {
-                if (DebuggingM.BuildingAssert == 2) {
+                if (DebuggingM.BuildingAssert == 2)
+                {
                     Debug.Log("No space on the map in(" + x + "," + y + ")");
                 }
                 //Cannot build action - no space on the map in (x,y)
             }
-        }else
+        }
+        else
         {
             //Cannot build action - no free id for a building
             if (DebuggingM.BuildingAssert == 2)
@@ -86,7 +91,8 @@ public class Building
 
     }
 
-    public bool[,] getSpaceOccupied() {
+    public bool[,] getSpaceOccupied()
+    {
         return BuildingUUID.getSpaceOccupied(uuid);
     }
 }

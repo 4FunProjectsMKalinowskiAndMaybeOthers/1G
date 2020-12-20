@@ -6,26 +6,16 @@ using UnityEngine;
 
 public class SpaceFillingTestMain : MonoBehaviour
 {
-
+    //https://stackoverflow.com/questions/4942113/is-there-a-format-code-shortcut-for-visual-studio
     //See building class on Lukas's branch and adapt map to it
     Map m;
 
     // Start is called before the first frame update
     void Start()
     {
+
         m = new Map(10, 10);
         m.LoadTestMap();
-
-        List<Tuple<Map.OccupyState, Tuple<int, int>>> collidingFields = null;// = Map.compareOccupiedSpaces(8, 8, 0, 0, 0, 0, Map.OccupyState.Occupied);
-
-        Debug.Log("Colliding fields = " + collidingFields);
-        if (collidingFields != null)
-        {
-            foreach (Tuple<Map.OccupyState, Tuple<int, int>> tMain in collidingFields)
-            {
-                Debug.Log(tMain.Item2.Item1 + " " + tMain.Item2.Item2 + " " + tMain.Item1.ToString());
-            }
-        }
     }
 
 // Update is called once per frame

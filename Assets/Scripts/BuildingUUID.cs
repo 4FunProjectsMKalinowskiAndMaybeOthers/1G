@@ -9,32 +9,37 @@ namespace Assets
     class BuildingUUID
     {
         //List<Tuple<bool, bool>> spaceOccupied;
-        static bool[,] spaceOccupied = new bool[,] { 
+        static bool[,] spaceOccupied = new bool[,] {
             {true, true, false },
-            { false, true, true }, 
+            { false, true, true },
             {true, true, true }
         };
 
         //Need to assign null if building's occupied space has changed
         //(y,x) Upper, Down, Left, Right     -Like WSAD
         static Tuple<int, int>[] outermostFields = null;
-        
+        static bool? emptySpace = null;
+
 
         public static bool[,] getSpaceOccupied(long uuid)
         {
-            
             return spaceOccupied;
         }
 
         //HERETODO: This method
-        //Using singleton pattern
-        public static Tuple<int, int>[] getOutermostFields(long uuid) {
+        //Using singleton pattern?
+        /// <summary>
+        /// Returns Tuple&lt;Y, X&gt;[4] where 0-UP 1-DOWN 2-LEFT 3-RIGHT 
+        /// </summary>
+        public static Tuple<int, int>[] getOutermostFields(long uuid)
+        {
             //HERETODO: Check if building is not empty
-            
+
             //Sides
-            if (outermostFields == null) {
+            if (emptySpace == null && outermostFields == null)
+            {
                 //Upper, Down, Left, Right     -Like WSAD
-                bool empty = true;
+                emptySpace = true;
                 int[] xOF, yOF;
                 yOF = new int[4];
                 xOF = new int[4];
@@ -53,7 +58,7 @@ namespace Assets
                     {
                         if (spaceOccupied[y, x] == true)
                         {
-                            empty = false;
+                            emptySpace = false;
                             if (yOF[0] > y)
                             {
                                 yOF[0] = y;
@@ -77,13 +82,13 @@ namespace Assets
                         }
                     }
                 }
-                if (empty == false)
+                if (emptySpace == false)
                 {
-                        outermostFields = new Tuple<int, int>[]{
+                    outermostFields = new Tuple<int, int>[]{
                              new Tuple<int, int>(yOF[0], xOF[0]), new Tuple<int, int>(yOF[1], xOF[1]),
                              new Tuple<int, int>(yOF[2], xOF[2]), new Tuple<int, int>(yOF[3], xOF[3])
                     };
-                }               
+                }
             }
 
             return outermostFields;
